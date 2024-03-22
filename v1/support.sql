@@ -26,7 +26,7 @@ BEGIN
     END IF;
 END;
 $$;
-GRANT USAGE ON PROCEDURE app_public.get_service_status(VARCHAR, INT) TO APPLICATION ROLE app_admin;
+GRANT USAGE ON PROCEDURE app_public.get_service_status(VARCHAR) TO APPLICATION ROLE app_admin;
 
 CREATE OR REPLACE PROCEDURE app_public.get_service_logs(service VARCHAR, instance INT, container VARCHAR, num_lines INT)
     RETURNS VARCHAR
