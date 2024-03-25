@@ -2,8 +2,11 @@
 USE ROLE nac;
 USE WAREHOUSE wh_nac;
 
+-- Create the APPLICATION
 DROP APPLICATION IF EXISTS spcs_app_instance;
 CREATE APPLICATION spcs_app_instance FROM APPLICATION PACKAGE spcs_app_pkg USING VERSION v1;
+
+-- Create the COMPUTE POOL for the APPLICATION
 DROP COMPUTE POOL IF EXISTS pool_nac;
 CREATE COMPUTE POOL pool_nac FOR APPLICATION spcs_app_instance
     MIN_NODES = 1 MAX_NODES = 1
@@ -11,6 +14,7 @@ CREATE COMPUTE POOL pool_nac FOR APPLICATION spcs_app_instance
     AUTO_RESUME = TRUE;
 GRANT USAGE ON COMPUTE POOL pool_nac TO APPLICATION spcs_app_instance;
 DESCRIBE COMPUTE POOL pool_nac;
+-- Wait until COMPUTE POOL state returns `IDLE` or `RUNNING`
 
 -- Grant permission(s) via Snowsight configuration UI
 GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO APPLICATION spcs_app_instance;
@@ -21,9 +25,8 @@ CALL spcs_app_instance.v1.register_single_callback(
   'ORDERS_TABLE' , 'ADD', SYSTEM$REFERENCE('TABLE', 'SNOWFLAKE_SAMPLE_DATA.TPCH_SF10.ORDERS', 'PERSISTENT', 'SELECT'));
 
 -- Start the app
--- CALL spcs_app_instance.app_public.start_app('POOL_NAC');
 CALL spcs_app_instance.app_public.start_app('POOL_NAC', 'WH_NAC');
+-- Grant usage of the app to others
 GRANT APPLICATION ROLE spcs_app_instance.app_user TO ROLE sandbox;
+-- Get the URL for the app
 CALL spcs_app_instance.app_public.app_url();
-
-
