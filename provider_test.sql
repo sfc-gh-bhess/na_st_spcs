@@ -30,6 +30,3 @@ CALL spcs_app_instance.app_public.start_app('POOL_NAC', 'WH_NAC');
 GRANT APPLICATION ROLE spcs_app_instance.app_user TO ROLE sandbox;
 -- Get the URL for the app
 CALL spcs_app_instance.app_public.app_url();
-
-
-CREATE VIEW IF NOT EXISTS sandbox.idea.orders AS SELECT * FROM snowflake_sample_data.tpch_sf10.orders;
