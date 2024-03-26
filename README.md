@@ -91,8 +91,8 @@ We can test our Native App on the Provider by mimicking what it would look like 
 Consumer side (a benefit/feature of the Snowflake Native App Framework).
 
 To do this, run the commands in `consumer_setup.sql`. This will create the role, 
-virtual warehouse, and COMPUTE POOL necessary for the Native App. The ROLE you will use
-for this is `NAC`.
+virtual warehouse, database, schema,  VIEW of the TPC-H data, and COMPUTE POOL necessary 
+for the Native App. The ROLE you will use for this is `NAC`.
 
 #### Testing on the Provider Side
 To install the Native App we need to install it, and also give it some privileges:

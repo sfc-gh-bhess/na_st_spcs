@@ -19,14 +19,6 @@ references:
       description: "Orders table in TPC-H samples"
       privileges:
         - SELECT
-      object_type: TABLE
+      object_type: VIEW
       multi_valued: false
       register_callback: v1.register_single_callback
-# - STREAMLIT_WAREHOUSE:
-#     label: "Streamlit Warehouse"
-#     description: "Warehouse to use with Streamlit in SPCS"
-#     privileges:
-#       - USAGE
-#     object_type: WAREHOUSE
-#     multi_valued: false
-#     register_callback: v1.register_single_callback

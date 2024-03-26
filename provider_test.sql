@@ -16,13 +16,13 @@ GRANT USAGE ON COMPUTE POOL pool_nac TO APPLICATION spcs_app_instance;
 DESCRIBE COMPUTE POOL pool_nac;
 -- Wait until COMPUTE POOL state returns `IDLE` or `RUNNING`
 
--- Grant permission(s) via Snowsight configuration UI
+-- Grant permission(s) via Snowsight configuration UI or via SQL
 GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO APPLICATION spcs_app_instance;
--- Grant access to the query warehouse via Snowsight configuration UI
-GRANT USAGE ON WAREHOUSE wh_nac TO APPLICATION spcs_app_instance;
--- Grant access to the TPC-H data in SNOWFLAKE_SAMPLE_DATA
+-- Grant access to the TPC-H ORDERS view in NAC_TEST.DATA via Snowsight Configuraiton UI or via SQL
 CALL spcs_app_instance.v1.register_single_callback(
-  'ORDERS_TABLE' , 'ADD', SYSTEM$REFERENCE('TABLE', 'SNOWFLAKE_SAMPLE_DATA.TPCH_SF10.ORDERS', 'PERSISTENT', 'SELECT'));
+  'ORDERS_TABLE' , 'ADD', SYSTEM$REFERENCE('VIEW', 'NAC_TEST.DATA.ORDERS', 'PERSISTENT', 'SELECT'));
+-- Grant access to the query warehouse via SQL
+GRANT USAGE ON WAREHOUSE wh_nac TO APPLICATION spcs_app_instance;
 
 -- Start the app
 CALL spcs_app_instance.app_public.start_app('POOL_NAC', 'WH_NAC');
@@ -30,3 +30,6 @@ CALL spcs_app_instance.app_public.start_app('POOL_NAC', 'WH_NAC');
 GRANT APPLICATION ROLE spcs_app_instance.app_user TO ROLE sandbox;
 -- Get the URL for the app
 CALL spcs_app_instance.app_public.app_url();
+
+
+CREATE VIEW IF NOT EXISTS sandbox.idea.orders AS SELECT * FROM snowflake_sample_data.tpch_sf10.orders;
