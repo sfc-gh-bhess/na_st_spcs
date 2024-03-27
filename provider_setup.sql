@@ -22,19 +22,19 @@ SHOW IMAGE REPOSITORIES IN SCHEMA spcs_app.napp;
 -- Upload files to Stage
 
 
-DROP APPLICATION PACKAGE IF EXISTS spcs_app_pkg;
-CREATE APPLICATION PACKAGE spcs_app_pkg;
-CREATE SCHEMA spcs_app_pkg.shared_data;
-CREATE TABLE spcs_app_pkg.shared_data.feature_flags(flags VARIANT, acct VARCHAR);
-CREATE SECURE VIEW spcs_app_pkg.shared_data.feature_flags_vw AS SELECT * FROM spcs_app_pkg.shared_data.feature_flags WHERE acct = current_account();
-GRANT USAGE ON SCHEMA spcs_app_pkg.shared_data TO SHARE IN APPLICATION PACKAGE spcs_app_pkg;
-GRANT SELECT ON VIEW spcs_app_pkg.shared_data.feature_flags_vw TO SHARE IN APPLICATION PACKAGE spcs_app_pkg;
-INSERT INTO spcs_app_pkg.shared_data.feature_flags SELECT parse_json('{"debug": ["GET_SERVICE_STATUS", "GET_SERVICE_LOGS", "LIST_LOGS", "TAIL_LOG"]}') AS flags, current_account() AS acct;
-GRANT USAGE ON SCHEMA spcs_app_pkg.shared_data TO SHARE IN APPLICATION PACKAGE spcs_app_pkg;
+DROP APPLICATION PACKAGE IF EXISTS na_st_spcs_pkg;
+CREATE APPLICATION PACKAGE na_st_spcs_pkg;
+CREATE SCHEMA na_st_spcs_pkg.shared_data;
+CREATE TABLE na_st_spcs_pkg.shared_data.feature_flags(flags VARIANT, acct VARCHAR);
+CREATE SECURE VIEW na_st_spcs_pkg.shared_data.feature_flags_vw AS SELECT * FROM na_st_spcs_pkg.shared_data.feature_flags WHERE acct = current_account();
+GRANT USAGE ON SCHEMA na_st_spcs_pkg.shared_data TO SHARE IN APPLICATION PACKAGE na_st_spcs_pkg;
+GRANT SELECT ON VIEW na_st_spcs_pkg.shared_data.feature_flags_vw TO SHARE IN APPLICATION PACKAGE na_st_spcs_pkg;
+INSERT INTO na_st_spcs_pkg.shared_data.feature_flags SELECT parse_json('{"debug": ["GET_SERVICE_STATUS", "GET_SERVICE_LOGS", "LIST_LOGS", "TAIL_LOG"]}') AS flags, current_account() AS acct;
+GRANT USAGE ON SCHEMA na_st_spcs_pkg.shared_data TO SHARE IN APPLICATION PACKAGE na_st_spcs_pkg;
 
 
 -- For Provider-side Testing
 USE ROLE naspcs_role;
-GRANT INSTALL, DEVELOP ON APPLICATION PACKAGE spcs_app_pkg TO ROLE nac;
+GRANT INSTALL, DEVELOP ON APPLICATION PACKAGE na_st_spcs_pkg TO ROLE nac;
 USE ROLE ACCOUNTADMIN;
 GRANT CREATE APPLICATION ON ACCOUNT TO ROLE nac;

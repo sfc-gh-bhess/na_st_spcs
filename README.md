@@ -50,8 +50,8 @@ make all
 
 This will create the 1 container image and push it to the IMAGE REPOSITORY.
 
-Next, you need to upload the files in the `v1` directory into the stage 
-`SPCS_APP.NAPP.APP_STAGE` in the folder `v1`.
+Next, you need to upload the files in the `na_st_spcs/v1` directory into the stage 
+`SPCS_APP.NAPP.APP_STAGE` in the folder `na_st_spcs/v1`.
 
 To create the VERSION for the APPLICATION PACKAGE, run the following commands
 (they are also in `provider_version.sql`):
@@ -59,7 +59,7 @@ To create the VERSION for the APPLICATION PACKAGE, run the following commands
 ```
 USE ROLE naspcs_role;
 -- for the first version of a VERSION
-ALTER APPLICATION PACKAGE spcs_app_pkg ADD VERSION v1 USING @spcs_app.napp.app_stage/v1;
+ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD VERSION v1 USING @spcs_app.napp.app_stage/na_st_spcs/v1;
 ```
 
 If you need to iterate, you can create a new PATCH for the version by running this
@@ -68,21 +68,8 @@ instead:
 ```
 USE ROLE naspcs_role;
 -- for subsequent updates to version
-ALTER APPLICATION PACKAGE spcs_app_pkg ADD PATCH FOR VERSION v1 USING @spcs_app.napp.app_stage/v1;
+ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD PATCH FOR VERSION v1 USING @spcs_app.napp.app_stage/na_st_spcs/v1;
 ```
-
-You Native App is now ready on the Provider Side. You can make the Native App available
-for installation in other Snowflake Accounts by setting a default PATCH and Sharing the App
-in the Snowsight UI.
-
-Navigate to the "Apps" tab and select "Packages" at the top. Now click on your App Package 
-(`SPCS_APP_PKG`). From here you can click on "Set release default" and choose the latest patch
-(the largest number) for version `v1`. 
-
-Next, click "Share app package". This will take you to the Provider Studio. Give the listing
-a title, choose "Only Specified Consumers", and click "Next". For "What's in the listing?", 
-select the App Package (`SPCS_APP_PKG`). Add a brief description. Lastly, add the Consumer account
-identifier to the "Add consumer accounts". Then click "Publish".
 
 ### Testing on the Provider Side
 
@@ -125,12 +112,25 @@ then visit the URL.
 To clean up the Native App test install, you can just `DROP` it:
 
 ```
-DROP APPLICATION spcs_app_instance;
+DROP APPLICATION na_st_spcs_app;
 ```
 
 You can also drop the COMPUTE POOL (`POOL_NAC`), the WAREHOUSE (`WH_NAC`), 
 and the ROLE (`NAC`);
 
+### Publishing/Sharing your Native App
+You Native App is now ready on the Provider Side. You can make the Native App available
+for installation in other Snowflake Accounts by setting a default PATCH and Sharing the App
+in the Snowsight UI.
+
+Navigate to the "Apps" tab and select "Packages" at the top. Now click on your App Package 
+(`NA_ST_SPCS_PKG`). From here you can click on "Set release default" and choose the latest patch
+(the largest number) for version `v1`. 
+
+Next, click "Share app package". This will take you to the Provider Studio. Give the listing
+a title, choose "Only Specified Consumers", and click "Next". For "What's in the listing?", 
+select the App Package (`NA_ST_SPCS_PKG`). Add a brief description. Lastly, add the Consumer account
+identifier to the "Add consumer accounts". Then click "Publish".
 
 ### Using the Native App on the Consumer Side
 
@@ -143,8 +143,8 @@ virtual warehouse for the Native App. The ROLE you will use for this is `NAC`.
 #### Using the Native App on the Consumer
 To get the Native app, navigate to the "Apps" sidebar. You should see the app at the top under
 "Recently Shared with You". Click the "Get" button. Select a Warehouse to use for installation.
-Under "Application name", choose the name `SPCS_APP_INSTANCE` (You _can_ choose a 
-different name, but the scripts use `SPCS_APP_INSTANCE`). Click "Get".
+Under "Application name", choose the name `NA_ST_SPCS_APP` (You _can_ choose a 
+different name, but the scripts use `NA_ST_SPCS_APP`). Click "Get".
 
 Run the commands in `consumer.sql`. After creating the COMPUTE POOL
 you will want to wait for the COMPUTE POOL to move to the `READY` or `IDLE`
@@ -181,7 +181,7 @@ role and are in the `app_public` schema:
 * `GET_SERVICE_LOGS()` which takes the same arguments and returns the same information as `SYSTEM$GET_SERVICE_LOGS()`
 
 The permissions to debug are managed on the Provider in the 
-`SPCS_APP_PKG.SHARED_DATA.FEATURE_FLAGS` table. 
+`NA_ST_SPCS_PKG.SHARED_DATA.FEATURE_FLAGS` table. 
 It has a very simple schema:
 * `acct` - the Snowflake account to enable. This should be set to the value of `SELECT current_account()` in that account.
 * `flags` - a VARIANT object. For debugging, the object should have a field named `debug` which is an 
