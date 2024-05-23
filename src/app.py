@@ -27,6 +27,7 @@ def top_clerks(_sess: Session, begin, end, topn):
                 .limit(topn) \
                 .to_pandas()
 
+st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Snowflake_Logo.svg/2560px-Snowflake_Logo.svg.png", width=120)
 st.sidebar.header(f"Hello, {user}")
 st.title("Top Clerks")
 
