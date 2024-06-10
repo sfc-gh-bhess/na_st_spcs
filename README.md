@@ -20,6 +20,11 @@ illustrative. For example, we would want the ability to create
 objects such as Stored Procedures or UDFs or Streamlits, but 
 this example focuses on creating SPCS services.
 
+KNOWN LIMITATION (for now): This does not actually handle
+upgrades properly. To do so, `version_initializer` needs to
+support running Python stored procedures, which currently is 
+a limitation.
+
 ## Setup
 There are 2 parts to set up, the Provider and the Consumer.
 
