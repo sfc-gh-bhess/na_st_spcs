@@ -1,8 +1,0 @@
-spec:
-  containers:
-    - name: streamlit
-      image: /spcs_app/napp/img_repo/st_spcs
-  endpoints:
-    - name: streamlit
-      port: 8501
-      public: true

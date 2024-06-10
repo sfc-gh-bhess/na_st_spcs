@@ -7,6 +7,19 @@ data and a slider to determine how many top clerks to display.
 The data is presented in a table sorted by highest seller
 to lowest. This example uses Streamlit for the frontend.
 
+This version uses a generic `setup.sql` and `config.sql` that
+uses Python stored procedures in `config.py` that will process
+a YAML file (in `objects.yml`) to programmatically create the 
+objects in the Application. The idea is that the `setup.sql`, 
+`config.sql`, and `config.py` files would stay constant, and new
+Applications only need to provide a new `objects.yml` that 
+describe the objects that the Application is going to create.
+
+At this time, the implementaiton is not complete, but rather
+illustrative. For example, we would want the ability to create
+objects such as Stored Procedures or UDFs or Streamlits, but 
+this example focuses on creating SPCS services.
+
 ## Setup
 There are 2 parts to set up, the Provider and the Consumer.
 
