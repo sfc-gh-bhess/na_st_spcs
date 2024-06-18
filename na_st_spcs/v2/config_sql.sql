@@ -1,10 +1,6 @@
 CREATE OR ALTER VERSIONED SCHEMA config;
 GRANT USAGE ON SCHEMA config TO APPLICATION ROLE app_admin;
 
-CREATE FILE FORMAT IF NOT EXISTS config.objects_format TYPE = JSON;
-CREATE OR ALTER TABLE config.objects(object VARIANT);
-COPY INTO config.objects FROM /objects.json FILE_FORMAT = (FORMAT_NAME = 'config.objects_format');
-
 -- CALLBACKS
 CREATE PROCEDURE config.reference_callback(ref_name STRING, operation STRING, ref_or_alias STRING)
  RETURNS STRING
@@ -80,10 +76,9 @@ CREATE PROCEDURE config.configuration_callback(ref_name STRING)
         i INTEGER;
     BEGIN
         SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: ' || ref_name);
+        CREATE FILE FORMAT IF NOT EXISTS objects_format TYPE = JSON;
         SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: reading objects file');
-        -- SELECT $1 INTO :obj FROM /objects.json (file_format => 'objects_format');
-        SELECT object INTO :obj FROM config.objects;
-        SELECT 
+        SELECT $1 INTO :obj FROM @/objects.json (file_format => 'objects_format');
         IF (GET(obj, ref_name) IS NOT NULL) THEN
             SELECT OBJECT_AGG(LOWER(key), value) INTO :obj2 FROM TABLE(FLATTEN(GET(GET(:obj, :ref_name), 'PARAMETERS'))) WHERE key NOT IN ('HOST_PORTS');
             SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: returning payload: ' || obj2);

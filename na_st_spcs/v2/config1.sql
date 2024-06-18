@@ -1,10 +1,6 @@
 CREATE OR ALTER VERSIONED SCHEMA config;
 GRANT USAGE ON SCHEMA config TO APPLICATION ROLE app_admin;
 
-CREATE FILE FORMAT IF NOT EXISTS config.objects_format TYPE = JSON;
-CREATE OR ALTER TABLE config.objects(object VARIANT);
-COPY INTO config.objects FROM /objects.json FILE_FORMAT = (FORMAT_NAME = 'config.objects_format');
-
 -- CALLBACKS
 CREATE PROCEDURE config.reference_callback(ref_name STRING, operation STRING, ref_or_alias STRING)
  RETURNS STRING
@@ -65,33 +61,13 @@ CREATE PROCEDURE config.configuration_callback(ref_name STRING)
     RETURNS string
     LANGUAGE SQL
     AS $$
-    -- BEGIN
-    --     CASE (ref_name)
-    --         WHEN 'EGRESS_EAI_WIKIPEDIA' THEN
-    --             -- Add EXTERNAL ACCESS INTEGRATION for upload.wikimedia.org
-    --             RETURN '{"type": "CONFIGURATION", "payload": { "host_ports": ["upload.wikimedia.org"], "allowed_secrets": "NONE" } }';
-    --     END;
-    --     RETURN '{"type": "ERROR", "payload": "Unknown Reference"}';
-    -- END;
-    DECLARE
-        obj OBJECT;
-        obj2 OBJECT;
-        retstr STRING;
-        i INTEGER;
     BEGIN
-        SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: ' || ref_name);
-        SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: reading objects file');
-        -- SELECT $1 INTO :obj FROM /objects.json (file_format => 'objects_format');
-        SELECT object INTO :obj FROM config.objects;
-        SELECT 
-        IF (GET(obj, ref_name) IS NOT NULL) THEN
-            SELECT OBJECT_AGG(LOWER(key), value) INTO :obj2 FROM TABLE(FLATTEN(GET(GET(:obj, :ref_name), 'PARAMETERS'))) WHERE key NOT IN ('HOST_PORTS');
-            SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: returning payload: ' || obj2);
-            RETURN OBJECT_CONSTRUCT('type', 'CONFIGURATION', 'payload', obj2);
-        ELSE
-            SYSTEM$LOG_INFO('NA_ST_SPCS: configuration_callback: Unkown reference: ' || ref_name);
-            RETURN OBJECT_CONSTRUCT('type', 'ERROR', 'payload', 'Unknown Reference');
-        END IF;
+        CASE (ref_name)
+            WHEN 'EGRESS_EAI_WIKIPEDIA' THEN
+                -- Add EXTERNAL ACCESS INTEGRATION for upload.wikimedia.org
+                RETURN '{"type": "CONFIGURATION", "payload": { "host_ports": ["upload.wikimedia.org"], "allowed_secrets": "NONE" } }';
+        END;
+        RETURN '{"type": "ERROR", "payload": "Unknown Reference"}';
     END;
     $$;
     GRANT USAGE ON PROCEDURE config.configuration_callback(STRING) TO APPLICATION ROLE app_admin;
@@ -187,7 +163,7 @@ CREATE OR REPLACE PROCEDURE config.service_suspended(name STRING)
     BEGIN
         SELECT BOOLOR_AGG(value) INTO :b 
             FROM TABLE(FLATTEN(
-                TRANSFORM(PARSE_JSON(SYSTEM$GET_SERVICE_STATUS(:name)), a VARIANT -> a:status = 'SUSPENDED')
+                TRANSFORM(PARSE_JSON(SYSTEM$GET_SERVICE_STATUS('FRONTEND')), a VARIANT -> a:status = 'SUSPENDED')
             ));
         SYSTEM$LOG_INFO('NA_ST_SPCS: service_suspended: Service suspended? ' || b);
         RETURN b;
@@ -634,7 +610,6 @@ CREATE OR REPLACE PROCEDURE config.upgrade_service_st_spcs()
         b2 BOOLEAN;
         suspended BOOLEAN;
         UPGRADE_ST_SERVICES_EXCEPTION EXCEPTION (-20002, 'Error upgrading ST_SPCS');
-        SIMULATED_ST_SERVICES_EXCEPTION EXCEPTION (-20002, 'Simulated Error upgrading ST_SPCS');
     BEGIN
         SYSTEM$LOG_INFO('NA_ST_SPCS: upgrade_service_st_spcs: upgrading service ST_SPCS');
 
