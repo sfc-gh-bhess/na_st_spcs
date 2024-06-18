@@ -540,7 +540,7 @@ CREATE OR REPLACE PROCEDURE config.create_service_st_spcs()
         SYSTEM$LOG_INFO('NA_ST_SPCS: create_service_st_spcs: waiting on service start');
         SELECT SYSTEM$WAIT_FOR_SERVICES(300, 'APP_PUBLIC.ST_SPCS');
         SYSTEM$LOG_INFO('NA_ST_SPCS: create_service_st_spcs: granting usage');
-        GRANT USAGE ON SERVICE app_public.st_spcs TO APPLICATION ROLE app_user;
+        GRANT SERVICE ROLE app_public.st_spcs!app TO APPLICATION ROLE app_user;
 
         SYSTEM$LOG_INFO('NA_ST_SPCS: create_service_st_spcs: finished!');
         RETURN true;

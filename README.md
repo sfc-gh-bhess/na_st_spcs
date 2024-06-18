@@ -13,7 +13,7 @@ There are 2 parts to set up, the Provider and the Consumer.
 This example expects that both Provider and Consumer have been
 set up with the prerequisite steps to enable for Snowpark 
 Container Services, specifically:
-```
+```sql
 USE ROLE ACCOUNTADMIN;
 CREATE SECURITY INTEGRATION IF NOT EXISTS snowservices_ingress_oauth
   TYPE=oauth
@@ -37,14 +37,14 @@ You will need the following as inputs:
 
 To create the files, run:
 
-```
+```bash
 bash ./config_napp.sh
 ```
 
 This created a `Makefile` with the necessary repository filled in. Feel free to look
 at the Makefile, but you can also just run:
 
-```
+```bash
 make all
 ```
 
@@ -56,7 +56,7 @@ Next, you need to upload the files in the `na_st_spcs/v2` directory into the sta
 To create the VERSION for the APPLICATION PACKAGE, run the following commands
 (they are also in `provider_version.sql`):
 
-```
+```sql
 USE ROLE naspcs_role;
 -- for the first version of a VERSION
 ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD VERSION v2 USING @spcs_app.napp.app_stage/na_st_spcs/v2;
@@ -65,7 +65,7 @@ ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD VERSION v2 USING @spcs_app.napp.app
 If you need to iterate, you can create a new PATCH for the version by running this
 instead:
 
-```
+```sql
 USE ROLE naspcs_role;
 -- for subsequent updates to version
 ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD PATCH FOR VERSION v2 USING @spcs_app.napp.app_stage/na_st_spcs/v2;
@@ -110,7 +110,7 @@ in the Native App, `app_public.app_url()`.
 ##### Cleanup
 To clean up the Native App test install, you can just `DROP` it:
 
-```
+```sql
 DROP APPLICATION na_st_spcs_app CASCADE;
 ```
 The `CASCADE` will also drop the `WAREHOUSE` and `COMPUTE POOL` that the
@@ -126,7 +126,7 @@ You need to upload the files in the `na_st_spcs/v2_bad` directory into the stage
 `SPCS_APP.NAPP.APP_STAGE` in the folder `na_st_spcs/v2_bad`.
 
 To create the VERSION for the APPLICATION PACKAGE, run the following commands
-```
+```sql
 USE ROLE naspcs_role;
 -- for subsequent updates to version
 ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD PATCH FOR VERSION v2 USING @spcs_app.napp.app_stage/na_st_spcs/v2_bad;
@@ -135,7 +135,7 @@ ALTER APPLICATION PACKAGE na_st_spcs_pkg ADD PATCH FOR VERSION v2 USING @spcs_ap
 Note the patch number.
 
 To attempt to upgrade the application, run the following:
-```
+```sql
 USE ROLE nac;
 ALTER APPLICATION na_st_spcs_app UPGRADE USING VERSION v2 PATCH <PATCH_NUMBER>;
 ```
@@ -216,16 +216,16 @@ It has a very simple schema:
 An example of how to enable logging for a particular account (for example, account 
 `ABC12345`) to give them all the debugging permissions would be
 
-```
-INSERT INTO llama2_pkg.shared_data.feature_flags 
+```sql
+INSERT INTO na_st_spcs_pkg.shared_data.feature_flags 
   SELECT parse_json('{"debug": ["GET_SERVICE_STATUS", "GET_SERVICE_LOGS"]}') AS flags, 
          'ABC12345' AS acct;
 ```
 
 To enable on the Provider account for use while developing on the Provider side, you could run
 
-```
-INSERT INTO llama2_pkg.shared_data.feature_flags 
+```sql
+INSERT INTO na_st_spcs_pkg.shared_data.feature_flags 
   SELECT parse_json('{"debug": ["GET_SERVICE_STATUS", "GET_SERVICE_LOGS"]}') AS flags,
          current_account() AS acct;
 ```
